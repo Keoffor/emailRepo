@@ -20,22 +20,6 @@ spec:
         ports:
         - containerPort: 8001
 
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: email-app
-  name: email-service
-spec:
-  type: LoadBalancer
-  ports:
-    - name: email-https
-      port: 8001
-      targetPort: 8001
-  selector:
-    app: email-app
 #---
 #apiVersion: monitoring.coreos.com/v1
 #kind: ServiceMonitor
