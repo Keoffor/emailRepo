@@ -40,7 +40,24 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+    <distributionManagement>
+		<repository>
+		<id>email-folder</id>
+		<url>https://pkgs.dev.azure.com/keoffor/Project0/_packaging/email-folder/maven/v1</url>
+		</repository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>email-folder</id>
+			<url>https://pkgs.dev.azure.com/keoffor/Project0/_packaging/email-folder/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<plugin>
