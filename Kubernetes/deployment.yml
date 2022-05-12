@@ -14,7 +14,7 @@ spec:
         app: email-app
     spec:
       containers:
-      - image: keoffor/email:v1
+      - image: keoffor/email-app
         imagePullPolicy: Always
         name: email-container
         ports:
