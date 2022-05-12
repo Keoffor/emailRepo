@@ -1,0 +1,69 @@
+trigger:
+- master
+stages:
+- stage: Build
+  displayName: build Maven package and Docker images
+  pool: ubuntu20
+  jobs:
+  - job: build
+    displayName: build
+
+    steps:
+    - task: SonarCloudPrepare@1
+      displayName: Sonar Analysis
+      inputs:
+        SonarCloud: 'obaz-pro'
+        organization: 'keoffor'
+        scannerMode: 'Other'
+        extraProperties: |
+          # Additional properties that will be passed to the scanner,
+          # Put one key=value per line, example:
+          # sonar.exclusions=**/*.bin
+          sonar.projectKey=keoffor_emailreimburse
+          sonar.projectName=emailreimburse
+
+    - task: Maven@3
+      displayName: Maven package
+      inputs:
+        mavenPomFile: 'pom.xml'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
+        sqMavenPluginVersionChoice: 'latest'
+
+    - task: Maven@3
+      displayName: publish coverage
+      inputs:
+        mavenPomFile: 'pom.xml'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        codeCoverageToolOption: 'JaCoCo'
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: true
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
+        sqMavenPluginVersionChoice: 'latest'   
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'docker-pro'
+        repository: 'keoffor/email-app'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.BuildId)
+          latest
+    - task: PublishPipelineArtifact@1
+      displayName: Publish artifacts
+      inputs:
+        targetPath: '$(Pipeline.Workspace)/s/Kubernetes'
+        artifact: 'manifest'
+        publishLocation: 'pipeline'
+        
