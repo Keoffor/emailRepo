@@ -14,7 +14,7 @@ spec:
         app: email-app
     spec:
       containers:
-      - image: obazacr.azurecr.io/keoffor/email-app
+      - image: obazacr.azurecr.io/keoffor/email-app:latest
         imagePullPolicy: Always
         name: email-container
         ports:
