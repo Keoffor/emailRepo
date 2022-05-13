@@ -66,4 +66,37 @@ stages:
         targetPath: '$(Pipeline.Workspace)/s/Kubernetes'
         artifact: 'manifest'
         publishLocation: 'pipeline'
-        
+
+- stage: deploy
+  dependsOn: Build
+  displayName: deploy to Aks
+  variables:
+    emailacr: emailsecret
+  jobs:
+    - job: deploy
+      pool: ubuntu20
+      displayName: Deploy to Testing Env.
+      steps:
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            buildType: 'current'
+            artifactName: 'manifest'
+            targetPath: '$(Pipeline.Workspace)/manifest'
+        - task: KubernetesManifest@0
+          inputs:
+            action: 'createSecret'
+            kubernetesServiceConnection: 'obakuber'
+            namespace: 'default'
+            secretType: 'dockerRegistry'
+            secretName: '$(emailacr)'
+            dockerRegistryEndpoint: 'docker-pro'
+        - task: KubernetesManifest@0
+          inputs:
+            action: 'deploy'
+            kubernetesServiceConnection: 'obakuber'
+            namespace: 'default'
+            manifests: |
+              $(Pipeline.Workspace)/manifest/deployment.yml
+              $(Pipeline.Workspace)/manifest/service.yml
+
+
