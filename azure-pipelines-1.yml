@@ -1,5 +1,8 @@
 trigger:
 - main
+variables:
+ imageRepo: keoffor/email-app
+ tag: $(Build.BuildId)
 stages:
 - stage: Build
   displayName: build Maven package and Docker images
@@ -54,12 +57,10 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'docker-pro'
-        repository: 'keoffor/email-app'
+        repository: '$(imageRepo)'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
-        tags: |
-          $(Build.BuildId)
-          latest
+        tags: '$(tag)'
     - task: PublishPipelineArtifact@1
       displayName: Publish artifacts
       inputs:
@@ -72,6 +73,7 @@ stages:
   displayName: deploy to Aks
   variables:
     emailacr: emailsecret
+    imageacr: obazacr.azurecr.io
   jobs:
     - job: deploy
       pool: ubuntu20
@@ -98,5 +100,6 @@ stages:
             manifests: |
               $(Pipeline.Workspace)/manifest/deployment.yml
               $(Pipeline.Workspace)/manifest/service.yml
+            containers: '$(imageacr)/$(imageRepo):$(tag)'
 
 
