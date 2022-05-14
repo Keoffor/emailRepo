@@ -73,6 +73,7 @@ stages:
   displayName: deploy to Aks
   variables:
     emailacr: emailsecret
+    replicaNo: 2
 #    imageacr: obazacr.azurecr.io
   jobs:
     - job: deploy
@@ -92,6 +93,23 @@ stages:
             secretType: 'dockerRegistry'
             secretName: '$(emailacr)'
             dockerRegistryEndpoint: 'docker-pro'
+        - task: replacetokens@5
+          displayName: replace tokens
+          inputs:
+            rootDirectory: '$(Pipeline.Workspace)/manifest'
+            targetFiles: 'deployment.yml'
+            encoding: 'auto'
+            tokenPattern: 'custom'
+            tokenPrefix: '#'
+            tokenSuffix: '#'
+            writeBOM: true
+            actionOnMissing: 'warn'
+            keepToken: false
+            actionOnNoFiles: 'continue'
+            enableTransforms: false
+            enableRecursion: false
+            useLegacyPattern: false
+            enableTelemetry: true
         - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
