@@ -19,16 +19,3 @@ spec:
         name: email-container
         ports:
         - containerPort: 8001
-
-#---
-#apiVersion: monitoring.coreos.com/v1
-#kind: ServiceMonitor
-#metadata:
-# name: reimburse-monitor
-#spec:
-# selector:
-#   matchLabels:
-#     app: service-app
-# endpoints:
-#   - port: service-http
-#     path: "/actuator/prometheus"
