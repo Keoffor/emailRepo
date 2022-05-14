@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: email-deployment
 spec:
-  replicas: 1
+  replicas: #replicaNo#
   selector:
     matchLabels:
       app: email-app
