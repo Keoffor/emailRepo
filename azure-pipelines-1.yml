@@ -24,7 +24,6 @@ stages:
           # sonar.exclusions=**/*.bin
           sonar.projectKey=keoffor_emailreimburse
           sonar.projectName=emailreimburse
-
     - task: Maven@3
       displayName: Maven package
       inputs:
