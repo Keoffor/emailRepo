@@ -75,48 +75,52 @@ stages:
     replicaNo: 2
 #    imageacr: obazacr.azurecr.io
   jobs:
-    - job: deploy
+    - deployment: deploy
       pool: ubuntu20
       displayName: Deploy to Testing Env.
-      steps:
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            buildType: 'current'
-            artifactName: 'manifest'
-            targetPath: '$(Pipeline.Workspace)/manifest'
-        - task: KubernetesManifest@0
-          inputs:
-            action: 'createSecret'
-            kubernetesServiceConnection: 'obakuber'
-            namespace: 'default'
-            secretType: 'dockerRegistry'
-            secretName: '$(emailacr)'
-            dockerRegistryEndpoint: 'docker-pro'
-        - task: replacetokens@5
-          displayName: replace tokens
-          inputs:
-            rootDirectory: '$(Pipeline.Workspace)/manifest/'
-            targetFiles: 'deployment.yml'
-            encoding: 'auto'
-            tokenPattern: 'custom'
-            tokenPrefix: '#'
-            tokenSuffix: '#'
-            writeBOM: true
-            actionOnMissing: 'warn'
-            keepToken: false
-            actionOnNoFiles: 'continue'
-            enableTransforms: false
-            enableRecursion: false
-            useLegacyPattern: false
-            enableTelemetry: true
-        - task: KubernetesManifest@0
-          inputs:
-            action: 'deploy'
-            kubernetesServiceConnection: 'obakuber'
-            namespace: 'default'
-            manifests: |
-              $(Pipeline.Workspace)/manifest/deployment.yml
-              $(Pipeline.Workspace)/manifest/service.yml
-            containers: '$(imageRepo):$(tag)'
+      environment: 'obazenv.default'
+      strategy:
+       runOnce:
+        deploy:
+          steps:
+            - task: DownloadPipelineArtifact@2
+              inputs:
+                buildType: 'current'
+                artifactName: 'manifest'
+                targetPath: '$(Pipeline.Workspace)/manifest'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'createSecret'
+                kubernetesServiceConnection: 'obakuber'
+                namespace: 'default'
+                secretType: 'dockerRegistry'
+                secretName: '$(emailacr)'
+                dockerRegistryEndpoint: 'docker-pro'
+            - task: replacetokens@5
+              displayName: replace tokens
+              inputs:
+                rootDirectory: '$(Pipeline.Workspace)/manifest/'
+                targetFiles: 'deployment.yml'
+                encoding: 'auto'
+                tokenPattern: 'custom'
+                tokenPrefix: '#'
+                tokenSuffix: '#'
+                writeBOM: true
+                actionOnMissing: 'warn'
+                keepToken: false
+                actionOnNoFiles: 'continue'
+                enableTransforms: false
+                enableRecursion: false
+                useLegacyPattern: false
+                enableTelemetry: true
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'deploy'
+                kubernetesServiceConnection: 'obazenv-myAKSCluster-default-1652353003809'
+                namespace: 'default'
+                manifests: |
+                  $(Pipeline.Workspace)/manifest/deployment.yml
+                  $(Pipeline.Workspace)/manifest/service.yml
+                containers: '$(imageRepo):$(tag)'
 
 
