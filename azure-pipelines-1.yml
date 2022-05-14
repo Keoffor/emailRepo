@@ -73,7 +73,7 @@ stages:
   displayName: deploy to Aks
   variables:
     emailacr: emailsecret
-    imageacr: obazacr.azurecr.io
+#    imageacr: obazacr.azurecr.io
   jobs:
     - job: deploy
       pool: ubuntu20
@@ -100,6 +100,6 @@ stages:
             manifests: |
               $(Pipeline.Workspace)/manifest/deployment.yml
               $(Pipeline.Workspace)/manifest/service.yml
-            containers: '$(imageacr)/$(imageRepo):$(tag)'
+            containers: '$(imageRepo):$(tag)'
 
 
